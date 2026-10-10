@@ -37,12 +37,21 @@ import {
   getUesForParcours,
   updateUeParcours,
 } from "./server/services/ue/ue.service"
+import { openapi, swaggerPage } from "./openapi"
 
 initDatabase()
 
 const server = serve({
   port: 3001,
   routes: {
+    "/openapi.json": {
+      GET: () => Response.json(openapi),
+    },
+    "/docs": {
+      GET: () => new Response(swaggerPage, {
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      }),
+    },
     "/api/etudiants": {
       GET: async () => {
         const etudiants = getAllEtudiants()

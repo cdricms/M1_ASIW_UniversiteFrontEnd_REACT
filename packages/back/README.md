@@ -4,6 +4,7 @@ Depuis la racine du workspace : `bun install --frozen-lockfile`, puis `bun run d
 L'API écoute sur le port 3001 ; le front Vite transmet `/api` via son proxy.
 
 Ressources : `/api/parcours`, `/api/ues`, `/api/etudiants`, détails `/:id`, associations UE/parcours.
+Documentation interactive Swagger UI : `http://localhost:3001/docs` (spécification OpenAPI JSON : `http://localhost:3001/openapi.json`). 
 Les modèles TypeScript se trouvent dans `src/server/models` et les routes dans `src/index.ts`.
 Les réponses de création sont enveloppées (`{ message, parcours }`, `{ message, ue }`, etc.).
 
