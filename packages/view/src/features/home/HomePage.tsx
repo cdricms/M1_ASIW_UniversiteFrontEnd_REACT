@@ -10,10 +10,21 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { toast } from "@/components/ui/toast"
+import useApi from "@/lib/useApi"
+import type { Parcours, ParcoursResponse } from "@/types/types"
 import { Input } from "@base-ui/react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
 import * as z from "zod"
 
 const parcoursSchema = z.object({
@@ -21,7 +32,10 @@ const parcoursSchema = z.object({
   anneeFormation: z.union([z.literal(1), z.literal(2)]),
 })
 
-type Parcours = z.infer<typeof parcoursSchema>
+const ANNEE_FORMATION = {
+  1: "M1",
+  2: "M2",
+}
 
 export function HomePage() {
   const form = useForm<Parcours>({
@@ -32,20 +46,26 @@ export function HomePage() {
     },
   })
 
-  const submit = async (parcours: Parcours) => {
-    try {
-      console.log("Parcours à créer :", parcours)
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
-      // await useApi("/parcours", {
-      //   method: "POST",
-      //   data: parcours,
-      // })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { error, data, loading, submit } = useApi<ParcoursResponse, Parcours>(
+    "/parcours",
+    {
+      method: "POST",
+    },
+  )
 
-      form.reset()
-    } catch (error) {
-      console.error("Erreur lors de la création du parcours :", error)
-    }
+  const onSubmit = async () => {
+    const res = await submit(form.getValues())
+    if (res) toast.add({ title: res?.message })
+    setDialogOpen(false)
   }
+
+  useEffect(() => {
+    if (error) toast.add({ title: error })
+    setDialogOpen(false)
+  }, [error])
 
   return (
     <PageContainer>
@@ -55,9 +75,8 @@ export function HomePage() {
           description="Bienvenue sur l'espace de gestion de l'UPJV."
         />
 
-        <Dialog>
+        <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
           <DialogTrigger render={<Button>Créer un parcours</Button>} />
-
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Créer un parcours</DialogTitle>
@@ -66,11 +85,12 @@ export function HomePage() {
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={form.handleSubmit(submit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <FieldGroup>
                 <Field>
                   <Label htmlFor="nomParcours">Nom du parcours</Label>
                   <Input
+                    className="border rounded-md p-1 pl-2.5"
                     id="nomParcours"
                     {...form.register("nomParcours")}
                   />
@@ -81,26 +101,40 @@ export function HomePage() {
                   )}
                 </Field>
 
-                <Field>
-                  <Label htmlFor="anneeFormation">
-                    Année de formation
-                  </Label>
-                  <select
-                    id="anneeFormation"
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-                    {...form.register("anneeFormation", {
-                      setValueAs: (value) => Number(value),
-                    })}
-                  >
-                    <option value={1}>1ère année</option>
-                    <option value={2}>2ème année</option>
-                  </select>
-                  {form.formState.errors.anneeFormation && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.anneeFormation.message}
-                    </p>
+                <Controller
+                  control={form.control}
+                  name="anneeFormation"
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <Label htmlFor="anneeFormation">Année de formation</Label>
+                      <Select
+                        value={ANNEE_FORMATION[field.value]}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger
+                          id="anneeFormation"
+                          className="w-full"
+                          aria-invalid={fieldState.invalid}
+                          onBlur={field.onBlur}
+                        >
+                          <SelectValue placeholder="Choisir l'année" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(ANNEE_FORMATION).map(([k, v]) => (
+                            <SelectItem value={k}>{v}</SelectItem>
+                          ))}
+                          {/* <SelectItem value="1">1ère année</SelectItem> */}
+                          {/* <SelectItem value="2">2ème année</SelectItem> */}
+                        </SelectContent>
+                      </Select>
+                      {fieldState.error && (
+                        <p className="text-sm text-destructive">
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </Field>
                   )}
-                </Field>
+                />
 
                 <div className="flex justify-end gap-2">
                   <Button type="submit" disabled={form.formState.isSubmitting}>
