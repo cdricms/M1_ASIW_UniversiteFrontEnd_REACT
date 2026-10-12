@@ -10,66 +10,108 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Label } from "@/components/ui/label"
-import { Input, Select } from "@base-ui/react"
+import { Input } from "@base-ui/react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-type Parcours = {
-  nomParcours: string
-  anneeFormation: 1 | 2
-}
-
-const Parcours = z.object({
-  nomParcours: z.string(),
+const parcoursSchema = z.object({
+  nomParcours: z.string().trim().min(1, "Le nom du parcours est obligatoire"),
   anneeFormation: z.union([z.literal(1), z.literal(2)]),
-}) satisfies z.ZodType<Parcours>
+})
+
+type Parcours = z.infer<typeof parcoursSchema>
 
 export function HomePage() {
   const form = useForm<Parcours>({
-    resolver: zodResolver(Parcours),
+    resolver: zodResolver(parcoursSchema),
     defaultValues: {
       nomParcours: "",
       anneeFormation: 1,
     },
   })
 
-  // useApi("/parcours", { method: "POST", data: parcours })
-  //
-  //
+  const submit = async (parcours: Parcours) => {
+    try {
+      console.log("Parcours à créer :", parcours)
+
+      // await useApi("/parcours", {
+      //   method: "POST",
+      //   data: parcours,
+      // })
+
+      form.reset()
+    } catch (error) {
+      console.error("Erreur lors de la création du parcours :", error)
+    }
+  }
 
   return (
     <PageContainer>
-      <div className="flex flex-row justify-between w-full items-center">
+      <div className="flex w-full flex-row items-center justify-between">
         <PageHeader
           title="Gestion des parcours & notes"
           description="Bienvenue sur l'espace de gestion de l'UPJV."
         />
+
         <Dialog>
-          <form onSubmit={form.handleSubmit(submit)}>
-            <DialogTrigger
-              render={<Button>Créer un parcours</Button>}
-            ></DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Créer un parcours</DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
+          <DialogTrigger render={<Button>Créer un parcours</Button>} />
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Créer un parcours</DialogTitle>
+              <DialogDescription>
+                Renseignez le nom du parcours et son année de formation.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={form.handleSubmit(submit)}>
               <FieldGroup>
                 <Field>
-                  <Label htmlFor="nomParcours">Le nom du parcours stp</Label>
+                  <Label htmlFor="nomParcours">Nom du parcours</Label>
                   <Input
                     id="nomParcours"
-                    defaultValue=""
                     {...form.register("nomParcours")}
-                  ></Input>
+                  />
+                  {form.formState.errors.nomParcours && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.nomParcours.message}
+                    </p>
+                  )}
                 </Field>
-              </FieldGroup>
 
-              <Field name="anneeFormation"></Field>
-            </DialogContent>
-          </form>
+                <Field>
+                  <Label htmlFor="anneeFormation">
+                    Année de formation
+                  </Label>
+                  <select
+                    id="anneeFormation"
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    {...form.register("anneeFormation", {
+                      setValueAs: (value) => Number(value),
+                    })}
+                  >
+                    <option value={1}>1ère année</option>
+                    <option value={2}>2ème année</option>
+                  </select>
+                  {form.formState.errors.anneeFormation && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.anneeFormation.message}
+                    </p>
+                  )}
+                </Field>
+
+                <div className="flex justify-end gap-2">
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting
+                      ? "Création..."
+                      : "Créer le parcours"}
+                  </Button>
+                </div>
+              </FieldGroup>
+            </form>
+          </DialogContent>
         </Dialog>
       </div>
     </PageContainer>
