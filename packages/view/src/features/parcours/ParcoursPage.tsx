@@ -3,14 +3,9 @@ import { DataTable } from "@/components/ui/data-table";
 import { parcoursColumns } from "@/components/ui/columns";
 import useApi from "@/lib/useApi";
 import type { Parcours } from "@/types/types";
-import { useEffect } from "react";
 
 export function ParcoursPage() {
-  const { error, data, loading, submit } = useApi<Parcours[], void>("/parcours", { method: "GET" });
-
-  useEffect(() => {
-    submit();
-  }, []);
+  const { error, data, loading } = useApi<Parcours[], void>("/parcours", { immediate: true });
 
   return (
     <PageContainer>

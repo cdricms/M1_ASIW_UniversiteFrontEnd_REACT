@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table";
+import { ChevronDownIcon } from "lucide-react"
+import { useMemo } from "react"
+import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table"
 import {
   Table,
   TableBody,
@@ -7,16 +8,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { features } from "@/pages/parcours/parcours-table.features"; // adapte le chemin
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { features } from "@/lib/parcours-table.features"
+
+// Classes partagées par l'en-tête et les cellules d'une colonne (via `meta.className`)
+function columnClassName(columnDef: { meta?: unknown }) {
+  return (columnDef.meta as { className?: string } | undefined)?.className
+}
 
 interface DataTableProps<TData extends RowData> {
-  columns: ColumnDef<typeof features, TData>[];
-  data: TData[];
-  /** Colonne dont on propose un filtre par valeur (liste déroulante) */
-  filterColumn?: { id: string; label: string };
+  columns: ColumnDef<typeof features, TData>[]
+  data: TData[]
+  filterColumn?: { id: string; label: string }
 }
 
 export function DataTable<TData extends RowData>({
@@ -24,25 +29,23 @@ export function DataTable<TData extends RowData>({
   data,
   filterColumn,
 }: DataTableProps<TData>) {
-  // v9 gère sorting / filtres / pagination en interne
   const table = useTable<typeof features, TData>({
     features,
     columns,
     data,
     globalFilterFn: "includesString",
     initialState: { pagination: { pageIndex: 0, pageSize: 10 } },
-  });
+  })
 
-  const filterCol = filterColumn ? table.getColumn(filterColumn.id) : undefined;
+  const filterCol = filterColumn ? table.getColumn(filterColumn.id) : undefined
 
-  // valeurs uniques calculées depuis les données
   const filterOptions = useMemo(() => {
-    if (!filterColumn) return [];
+    if (!filterColumn) return []
     const values = data.map((d) =>
       String((d as Record<string, unknown>)[filterColumn.id]),
-    );
-    return Array.from(new Set(values)).sort();
-  }, [data, filterColumn]);
+    )
+    return Array.from(new Set(values)).sort()
+  }, [data, filterColumn])
 
   return (
     <div className="space-y-4">
@@ -55,18 +58,23 @@ export function DataTable<TData extends RowData>({
           className="max-w-sm"
         />
         {filterCol && (
-          <select
-            className="h-9 rounded-md border bg-background px-3 text-sm"
-            value={(filterCol.getFilterValue() as string) ?? ""}
-            onChange={(e) => filterCol.setFilterValue(e.target.value || undefined)}
-          >
-            <option value="">{filterColumn!.label} : toutes</option>
-            {filterOptions.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              className="h-9 appearance-none rounded-md border bg-background pl-3 pr-8 text-sm"
+              value={(filterCol.getFilterValue() as string) ?? ""}
+              onChange={(e) =>
+                filterCol.setFilterValue(e.target.value || undefined)
+              }
+            >
+              <option value="">{filterColumn!.label} : toutes</option>
+              {filterOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          </div>
         )}
       </div>
 
@@ -77,8 +85,13 @@ export function DataTable<TData extends RowData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  <TableHead
+                    key={header.id}
+                    className={columnClassName(header.column.columnDef)}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <table.FlexRender header={header} />
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -89,7 +102,10 @@ export function DataTable<TData extends RowData>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getAllCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={columnClassName(cell.column.columnDef)}
+                    >
                       <table.FlexRender cell={cell} />
                     </TableCell>
                   ))}
@@ -97,7 +113,10 @@ export function DataTable<TData extends RowData>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Aucun résultat.
                 </TableCell>
               </TableRow>
@@ -112,17 +131,20 @@ export function DataTable<TData extends RowData>({
           {table.getFilteredRowModel().rows.length} résultat(s)
         </span>
         <div className="flex items-center gap-2">
-          <select
-            className="h-9 rounded-md border bg-background px-2 text-sm"
-            value={table.state.pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-          >
-            {[10, 20, 50].map((n) => (
-              <option key={n} value={n}>
-                {n} / page
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              className="h-9 appearance-none rounded-md border bg-background pl-2 pr-8 text-sm"
+              value={table.state.pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+            >
+              {[10, 20, 50].map((n) => (
+                <option key={n} value={n}>
+                  {n} / page
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -146,5 +168,5 @@ export function DataTable<TData extends RowData>({
         </div>
       </div>
     </div>
-  );
+  )
 }
