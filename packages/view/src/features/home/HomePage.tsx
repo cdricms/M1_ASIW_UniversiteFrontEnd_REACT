@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "@/components/ui/toast"
 import useApi from "@/lib/useApi"
-import type { Parcours, ParcoursResponse } from "@/types/types"
+import type { ParcoursForm, ParcoursResponse } from "@/types/types"
 import { Input } from "@base-ui/react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -38,7 +38,7 @@ const ANNEE_FORMATION = {
 }
 
 export function HomePage() {
-  const form = useForm<Parcours>({
+  const form = useForm<ParcoursForm>({
     resolver: zodResolver(parcoursSchema),
     defaultValues: {
       nomParcours: "",
@@ -49,7 +49,7 @@ export function HomePage() {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { error, data, loading, submit } = useApi<ParcoursResponse, Parcours>(
+  const { error, data, loading, submit } = useApi<ParcoursResponse, ParcoursForm>(
     "/parcours",
     {
       method: "POST",
