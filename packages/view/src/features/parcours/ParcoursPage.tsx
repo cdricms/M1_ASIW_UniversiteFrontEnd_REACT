@@ -15,7 +15,7 @@ export function ParcoursPage() {
       ) : loading ? (
         <p>Chargement…</p>
       ) : (
-        <DataTable
+        <DataTable 
           columns={parcoursColumns}
           data={data ?? []}
           filterColumn={{ id: "anneeFormation", label: "Année" }}

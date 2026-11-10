@@ -55,39 +55,40 @@ export function DataTable<TData extends RowData>({
           placeholder="Rechercher…"
           value={table.state.globalFilter ?? ""}
           onChange={(e) => table.setGlobalFilter(e.target.value)}
-          className="max-w-sm"
+          className="max-w-sm border-black"
         />
         {filterCol && (
           <div className="relative">
             <select
-              className="h-9 appearance-none rounded-md border bg-background pl-3 pr-8 text-sm"
+              className="h-9 border border-black appearance-none rounded-full bg-background pl-3 pr-8 text-sm"
               value={(filterCol.getFilterValue() as string) ?? ""}
               onChange={(e) =>
                 filterCol.setFilterValue(e.target.value || undefined)
               }
             >
-              <option value="">{filterColumn!.label} : toutes</option>
+              <option value="">{filterColumn!.label} : All</option>
               {filterOptions.map((v) => (
                 <option key={v} value={v}>
-                  {v}
+                  Année : {v}
                 </option>
               ))}
             </select>
-            <ChevronDownIcon className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <ChevronDownIcon className= "pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
         )}
       </div>
 
       {/* Tableau */}
-      <div className="rounded-md border">
+      <div className="rounded-md bg-card">
         <Table>
-          <TableHeader>
+          <TableHeader
+            className='bg-black text-white rounded-md hover:bg-black'>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-black">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={columnClassName(header.column.columnDef)}
+                    className={`text-white pl-5 first:rounded-tl-md last:rounded-tr-md ${columnClassName(header.column.columnDef)}`}
                   >
                     {header.isPlaceholder ? null : (
                       <table.FlexRender header={header} />
@@ -104,7 +105,7 @@ export function DataTable<TData extends RowData>({
                   {row.getAllCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={columnClassName(cell.column.columnDef)}
+                      className={`pl-5 ${columnClassName(cell.column.columnDef)}`}
                     >
                       <table.FlexRender cell={cell} />
                     </TableCell>

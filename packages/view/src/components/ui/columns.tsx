@@ -43,7 +43,7 @@ export const parcoursColumns: ColumnDef<F, Parcours>[] = [
       <SortableHeader column={column} title="Année de formation" />
     ),
     // colonne réduite à la largeur de l'en-tête, valeurs alignées à droite dessous
-    meta: { className: "w-0 whitespace-nowrap text-right tabular-nums" },
+    meta: { className: "text-left" },
     filterFn: (row, id, value) => String(row.getValue(id)) === value,
   },
   {
