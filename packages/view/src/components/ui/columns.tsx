@@ -1,9 +1,9 @@
 import type { Column, ColumnDef } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ArrowUpDown, CreditCardIcon, DeleteIcon, Edit2Icon, EditIcon, EllipsisIcon, LogOutIcon, SettingsIcon, TrashIcon, UserIcon } from "lucide-react"
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Parcours } from "@/types/types"
 import type { features } from "@/lib/parcours-table.features"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "./dropdown-menu"
+import { ParcoursActions } from "@/features/parcours/ParcoursActions"
 
 type F = typeof features
 
@@ -33,7 +33,9 @@ function SortableHeader({
   )
 }
 
-export const parcoursColumns: ColumnDef<F, Parcours>[] = [
+export const getParcoursColumns = (
+  onChanged?: () => void,
+): ColumnDef<F, Parcours>[] => [
   {
     accessorKey: "nomParcours",
     header: ({ column }) => <SortableHeader column={column} title="Nom" />,
@@ -54,35 +56,12 @@ export const parcoursColumns: ColumnDef<F, Parcours>[] = [
       new Date(row.getValue<string>("created_at")).toLocaleDateString("fr-FR"),
   },
   {
-    id: "actions",                 // pas d'accessorKey : aucune donnée liée
+    id: "actions", // colonne d'affichage : aucune donnée liée
     header: "Actions",
     enableSorting: false,
-    enableGlobalFilter: false,     // la recherche ignore cette colonne
-    cell: ({ row }) => {
-      const parcours = row.original   // l'objet Parcours complet de la ligne
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Actions pour ${parcours.nomParcours}`}
-            onClick={() => console.log("Actions", parcours.id)}
-          >
-            <EllipsisIcon />
-          </Button>} />
-          <DropdownMenuContent>
-             <DropdownMenuItem>
-              <EditIcon />
-              Modifier
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              <TrashIcon />
-                Supprimer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
+    enableGlobalFilter: false,
+    cell: ({ row }) => (
+      <ParcoursActions parcours={row.original} onChanged={onChanged} />
+    ),
   },
 ]

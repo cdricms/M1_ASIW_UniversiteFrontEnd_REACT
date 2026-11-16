@@ -1,4 +1,4 @@
-import { ChevronDownIcon, Ellipsis, EllipsisIcon } from "lucide-react"
+import { ChevronDownIcon } from "lucide-react"
 import { useMemo } from "react"
 import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table"
 import {

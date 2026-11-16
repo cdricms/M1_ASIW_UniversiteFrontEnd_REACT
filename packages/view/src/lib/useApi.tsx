@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { apiFetch } from "./api"
-import { toast } from "@/components/ui/toast"
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
