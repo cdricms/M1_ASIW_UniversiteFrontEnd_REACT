@@ -15,6 +15,8 @@ export interface UpdateParcoursPayload {
   anneeFormation?: number;
 }
 
+
+
 export interface ParcoursWithInscrits extends Parcours {
   inscrits: Array<{
     id: number;

@@ -1,4 +1,5 @@
 import { PageContainer, PageHeader } from "@/components/layout/Page"
+import { ParcoursFormDialog } from "@/components/ParcoursFormDialog"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -66,87 +67,18 @@ export function HomePage() {
     if (error) toast.add({ title: error })
     setDialogOpen(false)
   }, [error])
-
+  const [open, setOpen] = useState(false)
+  
   return (
+    
     <PageContainer>
       <div className="flex w-full flex-row items-center justify-between">
         <PageHeader
           title="Gestion des parcours & notes"
           description="Bienvenue sur l'espace de gestion de l'UPJV."
         />
-
-        <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
-          <DialogTrigger render={<Button>Créer un parcours</Button>} />
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Créer un parcours</DialogTitle>
-              <DialogDescription>
-                Renseignez le nom du parcours et son année de formation.
-              </DialogDescription>
-            </DialogHeader>
-
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <FieldGroup>
-                <Field>
-                  <Label htmlFor="nomParcours">Nom du parcours</Label>
-                  <Input
-                    className="border rounded-md p-1 pl-2.5"
-                    id="nomParcours"
-                    {...form.register("nomParcours")}
-                  />
-                  {form.formState.errors.nomParcours && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.nomParcours.message}
-                    </p>
-                  )}
-                </Field>
-
-                <Controller
-                  control={form.control}
-                  name="anneeFormation"
-                  render={({ field, fieldState }) => (
-                    <Field>
-                      <Label htmlFor="anneeFormation">Année de formation</Label>
-                      <Select
-                        value={ANNEE_FORMATION[field.value]}
-                        onValueChange={(v) => field.onChange(Number(v))}
-                      >
-                        <SelectTrigger
-                          id="anneeFormation"
-                          className="w-full"
-                          aria-invalid={fieldState.invalid}
-                          onBlur={field.onBlur}
-                        >
-                          <SelectValue placeholder="Choisir l'année" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(ANNEE_FORMATION).map(([k, v]) => (
-                            <SelectItem value={k}>{v}</SelectItem>
-                          ))}
-                          {/* <SelectItem value="1">1ère année</SelectItem> */}
-                          {/* <SelectItem value="2">2ème année</SelectItem> */}
-                        </SelectContent>
-                      </Select>
-                      {fieldState.error && (
-                        <p className="text-sm text-destructive">
-                          {fieldState.error.message}
-                        </p>
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <div className="flex justify-end gap-2">
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting
-                      ? "Création..."
-                      : "Créer le parcours"}
-                  </Button>
-                </div>
-              </FieldGroup>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setOpen(true)}>Créer un parcours</Button>
+        <ParcoursFormDialog open={open} onOpenChange={setOpen} />
       </div>
     </PageContainer>
   )

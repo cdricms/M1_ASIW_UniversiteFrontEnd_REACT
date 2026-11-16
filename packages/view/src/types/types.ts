@@ -13,16 +13,7 @@ export interface ParcoursResponse {
   parcours: Parcours
 }
 
-export const ParcoursSortedBy = {
-  Name: 0,
-  Year: 1,
-  CreatedBy: 2
-} as const
-
-export type ParcoursSortedBy = typeof ParcoursSortedBy[keyof typeof ParcoursSortedBy]
-
-export interface ParcoursParamsSort {
-  sortedBy?: ParcoursSortedBy
-  sortedByOrientation?: "up" | "down"
-  searchQuery?: string
+export interface UpdateParcours {
+  nomParcours?: string;
+  anneeFormation?: number;
 }
