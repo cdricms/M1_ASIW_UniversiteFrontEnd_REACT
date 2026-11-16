@@ -90,6 +90,11 @@ export function ParcoursFormDialog({
 
   const { isSubmitting, errors } = form.formState
 
+  // En édition : rien à enregistrer tant que le nom n'a pas changé
+  const nomParcours = form.watch("nomParcours")
+  const nomInchange =
+    isEdit && nomParcours.trim() === parcours.nomParcours.trim()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -155,7 +160,7 @@ export function ParcoursFormDialog({
             />
 
             <div className="flex justify-end gap-2">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || nomInchange}>
                 {isSubmitting
                   ? "Enregistrement…"
                   : isEdit

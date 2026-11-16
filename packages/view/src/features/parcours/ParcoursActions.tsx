@@ -1,13 +1,6 @@
-import { EditIcon, EllipsisIcon, TrashIcon } from "lucide-react"
+import { EditIcon, TrashIcon } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import type { Parcours } from "@/types/types"
 import { ParcoursDeleteDialog } from "./ParcoursDeleteDialog"
 import { ParcoursFormDialog } from "./ParcoursFormDialog"
@@ -23,32 +16,27 @@ export function ParcoursActions({ parcours, onChanged }: ParcoursActionsProps) {
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={`Actions pour ${parcours.nomParcours}`}
-            >
-              <EllipsisIcon />
-            </Button>
-          }
-        />
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <EditIcon />
-            Modifier
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-            <TrashIcon />
-            Supprimer
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:bg-black hover:text-white"
+          aria-label={`Modifier ${parcours.nomParcours}`}
+          onClick={() => setEditOpen(true)}
+        >
+          <EditIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-destructive hover:bg-destructive hover:text-white"
+          aria-label={`Supprimer ${parcours.nomParcours}`}
+          onClick={() => setDeleteOpen(true)}
+        >
+          <TrashIcon />
+        </Button>
+      </div>
 
-      {/* En dehors du menu : sinon les dialogues seraient démontés à sa fermeture */}
       <ParcoursFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}

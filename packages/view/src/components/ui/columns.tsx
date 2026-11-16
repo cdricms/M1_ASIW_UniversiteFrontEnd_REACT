@@ -60,6 +60,8 @@ export const getParcoursColumns = (
     header: "Actions",
     enableSorting: false,
     enableGlobalFilter: false,
+    // largeur réduite au contenu : plus d'espace vide à droite
+    meta: { className: "w-0 whitespace-nowrap pr-5" },
     cell: ({ row }) => (
       <ParcoursActions parcours={row.original} onChanged={onChanged} />
     ),
